@@ -24,9 +24,7 @@ import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
-import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -45,8 +43,6 @@ public class MixinDisconnectedScreen extends Screen {
     @Shadow
     @Mutable
     private @Final Screen parent;
-    @Shadow
-    private @Final DisconnectionDetails details;
     @Unique
     private boolean autoReconnect$shouldAutoReconnect;
     @Unique
@@ -77,13 +73,7 @@ public class MixinDisconnectedScreen extends Screen {
             autoReconnect$shouldAutoReconnect = false;
         }
         else {
-            if (details.reason().getContents() instanceof TranslatableContents translatable
-                && translatable.getKey().equals("disconnect.transfer")
-            ) {
-                autoReconnect$shouldAutoReconnect = false;
-            } else {
-                autoReconnect$shouldAutoReconnect = ScreenMixinUtil.checkConditions(this);
-            }
+            autoReconnect$shouldAutoReconnect = ScreenMixinUtil.checkConditions(this);
 
             List<Button> buttons = autoReconnect$addButtons(
                     ((DisconnectedScreenAccessor)this).getLayout(), autoReconnect$shouldAutoReconnect);

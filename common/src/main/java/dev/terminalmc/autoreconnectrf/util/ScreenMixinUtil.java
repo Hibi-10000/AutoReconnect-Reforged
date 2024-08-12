@@ -25,6 +25,11 @@ public class ScreenMixinUtil {
         if (screen instanceof DisconnectedScreen ds) {
             // Doesn't work with realms disconnect screen
             Component reason = ((DisconnectedScreenAccessor)ds).getDetails().reason();
+            if (reason.getContents() instanceof TranslatableContents tc
+                    && tc.getKey().equals("disconnect.transfer")
+            ) {
+                return false;
+            }
             String reasonStr = reason.getString();
             AutoReconnect.lastDcReasonStr = reasonStr;
             AutoReconnect.lastDcReasonKey = null;
