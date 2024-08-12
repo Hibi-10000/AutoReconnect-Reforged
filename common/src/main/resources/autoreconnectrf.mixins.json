@@ -10,6 +10,7 @@
     "accessor.YACLScreenAccessor"
   ],
   "client": [
+    "MixinClientCommonPacketListenerImpl",
     "MixinClientPacketListener",
     "MixinConnectScreen",
     "MixinDisconnectedRealmsScreen",

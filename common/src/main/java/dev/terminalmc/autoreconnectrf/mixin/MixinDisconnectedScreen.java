@@ -16,6 +16,7 @@ package dev.terminalmc.autoreconnectrf.mixin;
 import dev.terminalmc.autoreconnectrf.AutoReconnect;
 import dev.terminalmc.autoreconnectrf.mixin.accessor.DisconnectedScreenAccessor;
 import dev.terminalmc.autoreconnectrf.util.ScreenMixinUtil;
+import dev.terminalmc.autoreconnectrf.util.ScreenMixinUtil.DisconnectedScreenTransfer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -39,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 import static dev.terminalmc.autoreconnectrf.util.Localization.localized;
 
 @Mixin(DisconnectedScreen.class)
-public class MixinDisconnectedScreen extends Screen {
+public class MixinDisconnectedScreen extends Screen implements DisconnectedScreenTransfer {
     @Shadow
     @Mutable
     private @Final Screen parent;
@@ -47,6 +48,13 @@ public class MixinDisconnectedScreen extends Screen {
     private boolean autoReconnect$shouldAutoReconnect;
     @Unique
     private Runnable autoReconnect$cancelCountdown;
+    @Unique
+    private boolean autoReconnect$transferring;
+
+    @Override
+    public void setAutoReconnect$transferring(boolean autoReconnect$transferring) {
+        this.autoReconnect$transferring = autoReconnect$transferring;
+    }
 
     protected MixinDisconnectedScreen(Component title) {
         super(title);
@@ -73,7 +81,7 @@ public class MixinDisconnectedScreen extends Screen {
             autoReconnect$shouldAutoReconnect = false;
         }
         else {
-            autoReconnect$shouldAutoReconnect = ScreenMixinUtil.checkConditions(this);
+            autoReconnect$shouldAutoReconnect = !autoReconnect$transferring && ScreenMixinUtil.checkConditions(this);
 
             List<Button> buttons = autoReconnect$addButtons(
                     ((DisconnectedScreenAccessor)this).getLayout(), autoReconnect$shouldAutoReconnect);
